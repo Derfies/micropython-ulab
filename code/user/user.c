@@ -61,7 +61,7 @@ static mp_obj_t user_square(size_t n_args, const mp_obj_t *args) {
         // WORKS. How to set array value by index.
         // First handle.
         for(size_t i=pos; i < next_pos; i++, (val) += (val_step)) {
-            ndarray_set_value(NDARRAY_UINT8, results->array, i, mp_obj_new_int(r));
+            ndarray_set_value(NDARRAY_UINT8, results->array, i, mp_obj_new_int(val));
         }
 
         pos = next_pos;
