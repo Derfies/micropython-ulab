@@ -33,10 +33,7 @@ static mp_obj_t user_square(size_t n_args, const mp_obj_t *args) {
     // float but cast to int every time.
 
     // TODO: Off by 1 error - 255 element isn't being filled.
-
-    size_t *shape = m_new(size_t, 1);
-    shape[0] = 256;
-    ndarray_obj_t *results = ndarray_new_dense_ndarray(1, shape, NDARRAY_UINT8);
+    ndarray_obj_t *results = ndarray_new_linear_array(1, NDARRAY_UINT8);
 
     mp_int_t pos = 0;
     mp_int_t val = 0;
@@ -48,9 +45,9 @@ static mp_obj_t user_square(size_t n_args, const mp_obj_t *args) {
             mp_raise_TypeError(MP_ERROR_TEXT("must be a tuple EEEDIOT"));
         }
 
-        // Ensure the tuple is of size 4.
+        // Ensure the tuple is of size 2.
         mp_obj_tuple_t *handle = MP_OBJ_TO_PTR(args[a]);
-        if(handle->len != 4) {
+        if(handle->len != 2) {
             mp_raise_TypeError(MP_ERROR_TEXT("Must be of length 4"));
         }
 
