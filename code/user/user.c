@@ -22,67 +22,69 @@
 //| """This module should hold arbitrary user-defined functions."""
 //|
 
-static mp_obj_t user_square(mp_obj_t arg) {
-    // the function takes a single dense ndarray, and calculates the
-    // element-wise square of its entries
+static mp_obj_t user_square(size_t n_args, const mp_obj_t *args) {
 
-    // raise a TypeError exception, if the input is not an ndarray
-    if(!mp_obj_is_type(arg, &ulab_ndarray_type)) {
-        mp_raise_TypeError(MP_ERROR_TEXT("input must be an ndarray"));
+    // Create a 1D gradient.
+    // Resulting array should be of shape (3, 256)
+    // This is because we want to be able to perform np.take on the result, and
+    // there needs to be 256 values to do the lookup.
+    // Resulting array will be of type int.
+    // Some cumulative float error happening here since we calculate step as a
+    // float but cast to int every time.
+
+    // TODO: Off by 1 error - 255 element isn't being filled.
+
+    //ndarray_obj_t *results = ndarray_new_linear_array(256, NDARRAY_UINT8);
+    size_t *shape = m_new(size_t, 2);
+    shape[0] = 3;
+    shape[1] = 256;
+    ndarray_obj_t *results = ndarray_new_dense_ndarray(2, shape, NDARRAY_UINT8);
+
+    mp_int_t pos = 0, r = 0, g = 0, b = 0;
+
+    for(size_t a=0; a < n_args; a++) {
+
+        // Ensure the arg is a tuple.
+        if(!mp_obj_is_type(args[a], &mp_type_tuple)) {
+            mp_raise_TypeError(MP_ERROR_TEXT("must be a tuple EEEDIOT"));
+        }
+
+        // Ensure the tuple is of size 4.
+        mp_obj_tuple_t *handle = MP_OBJ_TO_PTR(args[a]);
+        if(handle->len != 4) {
+            mp_raise_TypeError(MP_ERROR_TEXT("Must be of length 4"));
+        }
+
+        mp_int_t next_pos = mp_obj_get_int(handle->items[0]);
+        mp_int_t next_r = mp_obj_get_int(handle->items[1]);
+        mp_int_t next_g = mp_obj_get_int(handle->items[2]);
+        mp_int_t next_b = mp_obj_get_int(handle->items[3]);
+        mp_int_t r_step = (next_r - r) / (next_pos - pos);
+        mp_int_t g_step = (next_g - g) / (next_pos - pos);
+        mp_int_t b_step = (next_b - b) / (next_pos - pos);
+
+        // WORKS. How to set array value by index.
+        // First handle.
+        for(size_t i=pos; i < next_pos; i++, (r) += (r_step), (g) += (g_step), (b) += (b_step)) {
+            ndarray_set_value(NDARRAY_UINT8, results->array, i, mp_obj_new_int(r));
+            ndarray_set_value(NDARRAY_UINT8, results->array, 256 + i, mp_obj_new_int(g));
+            ndarray_set_value(NDARRAY_UINT8, results->array, 512 + i, mp_obj_new_int(b));
+        }
+
+        pos = next_pos;
+        r = next_r;
+        g = next_g;
+        b = next_b;
     }
-    ndarray_obj_t *ndarray = MP_OBJ_TO_PTR(arg);
 
-    // make sure that the input is a dense array
-    if(!ndarray_is_dense(ndarray)) {
-        mp_raise_TypeError(MP_ERROR_TEXT("input must be a dense ndarray"));
-    }
-
-    // if the input is a dense array, create `results` with the same number of
-    // dimensions, shape, and dtype
-    ndarray_obj_t *results = ndarray_new_dense_ndarray(ndarray->ndim, ndarray->shape, ndarray->dtype);
-
-    // since in a dense array the iteration over the elements is trivial, we
-    // can cast the data arrays ndarray->array and results->array to the actual type
-    if(ndarray->dtype == NDARRAY_UINT8) {
-        uint8_t *array = (uint8_t *)ndarray->array;
-        uint8_t *rarray = (uint8_t *)results->array;
-        for(size_t i=0; i < ndarray->len; i++, array++) {
-            *rarray++ = (*array) * (*array);
-        }
-    } else if(ndarray->dtype == NDARRAY_INT8) {
-        int8_t *array = (int8_t *)ndarray->array;
-        int8_t *rarray = (int8_t *)results->array;
-        for(size_t i=0; i < ndarray->len; i++, array++) {
-            *rarray++ = (*array) * (*array);
-        }
-    } else if(ndarray->dtype == NDARRAY_UINT16) {
-        uint16_t *array = (uint16_t *)ndarray->array;
-        uint16_t *rarray = (uint16_t *)results->array;
-        for(size_t i=0; i < ndarray->len; i++, array++) {
-            *rarray++ = (*array) * (*array);
-        }
-    } else if(ndarray->dtype == NDARRAY_INT16) {
-        int16_t *array = (int16_t *)ndarray->array;
-        int16_t *rarray = (int16_t *)results->array;
-        for(size_t i=0; i < ndarray->len; i++, array++) {
-            *rarray++ = (*array) * (*array);
-        }
-    } else { // if we end up here, the dtype is NDARRAY_FLOAT
-        mp_float_t *array = (mp_float_t *)ndarray->array;
-        mp_float_t *rarray = (mp_float_t *)results->array;
-        for(size_t i=0; i < ndarray->len; i++, array++) {
-            *rarray++ = (*array) * (*array);
-        }
-    }
-    // at the end, return a micrppython object
     return MP_OBJ_FROM_PTR(results);
 }
 
-MP_DEFINE_CONST_FUN_OBJ_1(user_square_obj, user_square);
+MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(user_square_obj, 1, 4, user_square);
 
 static const mp_rom_map_elem_t ulab_user_globals_table[] = {
-    { MP_OBJ_NEW_QSTR(MP_QSTR___name__), MP_OBJ_NEW_QSTR(MP_QSTR_user) },
-    { MP_OBJ_NEW_QSTR(MP_QSTR_square), (mp_obj_t)&user_square_obj },
+    { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_user) },
+    { MP_ROM_QSTR(MP_QSTR_square), MP_ROM_PTR(&user_square_obj) },
 };
 
 static MP_DEFINE_CONST_DICT(mp_module_ulab_user_globals, ulab_user_globals_table);
