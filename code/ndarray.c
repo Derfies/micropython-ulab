@@ -1212,7 +1212,7 @@ static mp_obj_t ndarray_from_integer_index(ndarray_obj_t *ndarray, ndarray_obj_t
     // TODO: normalize or handle negative indices in loop (without modifying index)
 
     int32_t *strides = strides_from_shape(index->shape, ndarray->dtype);
-    ndarray_obj_t *results = ndarray_new_ndarray(index->ndim, index->shape, strides, ndarray->dtype);
+    ndarray_obj_t *results = ndarray_new_ndarray(index->ndim, index->shape, strides, ndarray->dtype, NULL);
 
     uint8_t *larray = (uint8_t *)ndarray->array;
     uint8_t *iarray = (uint8_t *)index->array;
