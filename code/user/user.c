@@ -33,14 +33,10 @@ static mp_obj_t user_square(size_t n_args, const mp_obj_t *args) {
     // float but cast to int every time.
 
     // TODO: Off by 1 error - 255 element isn't being filled.
+    ndarray_obj_t *results = ndarray_new_linear_array(256, NDARRAY_UINT8);
 
-    //ndarray_obj_t *results = ndarray_new_linear_array(256, NDARRAY_UINT8);
-    size_t *shape = m_new(size_t, 2);
-    shape[0] = 3;
-    shape[1] = 256;
-    ndarray_obj_t *results = ndarray_new_dense_ndarray(2, shape, NDARRAY_UINT8);
-
-    mp_int_t pos = 0, r = 0, g = 0, b = 0;
+    mp_int_t pos = 0;
+    mp_int_t val = 0;
 
     for(size_t a=0; a < n_args; a++) {
 
@@ -49,32 +45,24 @@ static mp_obj_t user_square(size_t n_args, const mp_obj_t *args) {
             mp_raise_TypeError(MP_ERROR_TEXT("must be a tuple EEEDIOT"));
         }
 
-        // Ensure the tuple is of size 4.
+        // Ensure the tuple is of size 2.
         mp_obj_tuple_t *handle = MP_OBJ_TO_PTR(args[a]);
-        if(handle->len != 4) {
-            mp_raise_TypeError(MP_ERROR_TEXT("Must be of length 4"));
+        if(handle->len != 2) {
+            mp_raise_TypeError(MP_ERROR_TEXT("Must be of length 2"));
         }
 
         mp_int_t next_pos = mp_obj_get_int(handle->items[0]);
-        mp_int_t next_r = mp_obj_get_int(handle->items[1]);
-        mp_int_t next_g = mp_obj_get_int(handle->items[2]);
-        mp_int_t next_b = mp_obj_get_int(handle->items[3]);
-        mp_int_t r_step = (next_r - r) / (next_pos - pos);
-        mp_int_t g_step = (next_g - g) / (next_pos - pos);
-        mp_int_t b_step = (next_b - b) / (next_pos - pos);
+        mp_int_t next_val = mp_obj_get_int(handle->items[1]);
+        mp_int_t val_step = (next_val - val) / (next_pos - pos);
 
         // WORKS. How to set array value by index.
         // First handle.
-        for(size_t i=pos; i < next_pos; i++, (r) += (r_step), (g) += (g_step), (b) += (b_step)) {
-            ndarray_set_value(NDARRAY_UINT8, results->array, i, mp_obj_new_int(r));
-            ndarray_set_value(NDARRAY_UINT8, results->array, 256 + i, mp_obj_new_int(g));
-            ndarray_set_value(NDARRAY_UINT8, results->array, 512 + i, mp_obj_new_int(b));
+        for(size_t i=pos; i < next_pos; i++, (val) += (val_step)) {
+            ndarray_set_value(NDARRAY_UINT8, results->array, i, mp_obj_new_int(val));
         }
 
         pos = next_pos;
-        r = next_r;
-        g = next_g;
-        b = next_b;
+        val = next_val;
     }
 
     return MP_OBJ_FROM_PTR(results);
