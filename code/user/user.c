@@ -22,7 +22,7 @@
 //| """This module should hold arbitrary user-defined functions."""
 //|
 
-static mp_obj_t user_square(size_t n_args, const mp_obj_t *args) {
+static mp_obj_t user_gradient(size_t n_args, const mp_obj_t *args) {
 
     // Create a 1D gradient.
     // Resulting array should be of shape (3, 256)
@@ -68,11 +68,11 @@ static mp_obj_t user_square(size_t n_args, const mp_obj_t *args) {
     return MP_OBJ_FROM_PTR(results);
 }
 
-MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(user_square_obj, 1, 4, user_square);
+MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(user_gradient_obj, 1, 4, user_gradient);
 
 static const mp_rom_map_elem_t ulab_user_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_user) },
-    { MP_ROM_QSTR(MP_QSTR_square), MP_ROM_PTR(&user_square_obj) },
+    { MP_ROM_QSTR(MP_QSTR_gradient), MP_ROM_PTR(&user_gradient_obj) },
 };
 
 static MP_DEFINE_CONST_DICT(mp_module_ulab_user_globals, ulab_user_globals_table);
