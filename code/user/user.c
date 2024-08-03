@@ -42,21 +42,20 @@ static mp_obj_t user_gradient(size_t n_args, const mp_obj_t *args) {
 
         // Ensure the arg is a tuple.
         if(!mp_obj_is_type(args[a], &mp_type_tuple)) {
-            mp_raise_TypeError(MP_ERROR_TEXT("must be a tuple EEEDIOT"));
+            mp_raise_TypeError(MP_ERROR_TEXT("Stop must be of type tuple"));
         }
 
         // Ensure the tuple is of size 2.
-        mp_obj_tuple_t *handle = MP_OBJ_TO_PTR(args[a]);
-        if(handle->len != 2) {
-            mp_raise_TypeError(MP_ERROR_TEXT("Must be of length 2"));
+        mp_obj_tuple_t *stop = MP_OBJ_TO_PTR(args[a]);
+        if(stop->len != 2) {
+            mp_raise_TypeError(MP_ERROR_TEXT("Stop must be of length 2"));
         }
 
-        mp_int_t next_pos = mp_obj_get_int(handle->items[0]);
-        mp_int_t next_val = mp_obj_get_int(handle->items[1]);
+        mp_int_t next_pos = mp_obj_get_int(stop->items[0]);
+        mp_int_t next_val = mp_obj_get_int(stop->items[1]);
         mp_int_t val_step = (next_val - val) / (next_pos - pos);
 
-        // WORKS. How to set array value by index.
-        // First handle.
+        // Write values into results array.
         for(size_t i=pos; i < next_pos; i++, (val) += (val_step)) {
             ndarray_set_value(NDARRAY_UINT8, results->array, i, mp_obj_new_int(val));
         }
