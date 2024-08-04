@@ -111,7 +111,7 @@ static mp_obj_t user_test(mp_obj_t foo) {
 //
 //    uint8_t *array = (uint8_t *)ndarray->array;
 //    uint8_t *rarray = (uint8_t *)results->array;
-    mp_float_t *array1 = (uint8_t *)ndarray->array;
+    mp_float_t *array1 = (mp_float_t *)ndarray->array;
     mp_float_t (*func1)(void *) = ndarray_get_float_function(ndarray->dtype);
 
 
@@ -119,7 +119,7 @@ static mp_obj_t user_test(mp_obj_t foo) {
     //mp_float_t x = 1.1;
     for(size_t i=0; i < ndarray->len; i++) {
         *rarray++ = func1(array1);
-        *array1++;
+        array1++;
     }
 //    uint8_t *array = (uint8_t *)ndarray->array;
 //    for(size_t i=0; i < ndarray->len; i++) {
