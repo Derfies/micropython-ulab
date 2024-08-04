@@ -69,7 +69,16 @@ static mp_obj_t user_gradient(size_t n_args, const mp_obj_t *args) {
 
 static mp_obj_t user_test(mp_obj_t foo) {
 
-    return mp_obj_new_int(1);
+    ndarray_obj_t *new_ndarray = ndarray_new_dense_ndarray(foo->ndim, foo->shape, foo->dtype);
+
+    mp_int_t val = 0;
+    mp_int_t val_step = 0.1;
+    for(size_t i=0; i < foo->len; i++, (val) += (val_step)) {
+        ndarray_set_value(foo->dtype, results->array, i, mp_obj_new_float(val));
+    }
+
+
+    return MP_OBJ_FROM_PTR(results);
 }
 
 MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(user_gradient_obj, 1, 4, user_gradient);
