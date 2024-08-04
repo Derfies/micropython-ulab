@@ -94,37 +94,18 @@ static mp_obj_t user_gradient(size_t n_args, const mp_obj_t *args) {
     return MP_OBJ_FROM_PTR(results);
 }
 
-static mp_obj_t user_test(mp_obj_t foo) {
+static mp_obj_t user_test(mp_obj_t arg) {
 
-    ndarray_obj_t *ndarray = MP_OBJ_TO_PTR(foo);
-
+    ndarray_obj_t *ndarray = MP_OBJ_TO_PTR(arg);
     ndarray_obj_t *results = ndarray_new_dense_ndarray(ndarray->ndim, ndarray->shape, ndarray->dtype);
 
-//    mp_int_t val = 0;
-//    mp_int_t val_step = 0.1;
-//    for(size_t i=0; i < ndarray->len; i++, (val) += (val_step)) {
-//        ndarray_set_value(ndarray->dtype, results->array, i, mp_obj_new_float(val));
-//    }
-
-
-//    mp_int_t x = 6;
-//
-//    uint8_t *array = (uint8_t *)ndarray->array;
-//    uint8_t *rarray = (uint8_t *)results->array;
-    mp_float_t *array1 = (mp_float_t *)ndarray->array;
+    mp_float_t *array = (mp_float_t *)ndarray->array;
     mp_float_t (*func1)(void *) = ndarray_get_float_function(ndarray->dtype);
-
-
     mp_float_t *rarray = (mp_float_t *)results->array;
-    //mp_float_t x = 1.1;
     for(size_t i=0; i < ndarray->len; i++) {
-        *rarray++ = func1(array1);
-        array1++;
+        *rarray++ = fast_cosine(func1(array));
+        array++;
     }
-//    uint8_t *array = (uint8_t *)ndarray->array;
-//    for(size_t i=0; i < ndarray->len; i++) {
-//        ndarray_set_value(ndarray->dtype, results->array, i, mp_obj_new_int(val));
-//    }
 
     return MP_OBJ_FROM_PTR(results);
 }
