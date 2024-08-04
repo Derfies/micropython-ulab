@@ -22,6 +22,33 @@
 //| """This module should hold arbitrary user-defined functions."""
 //|
 
+
+// x range: [-PI,PI]
+float fast_sine(float x) {
+    constexpr float PI = 3.14159265358f;
+    constexpr float B = 4.0f / PI;
+    constexpr float C = -4.0f / (PI * PI);
+    constexpr float P = 0.225f;
+
+    float y = B * x + C * x * (x < 0 ? -x : x);
+    return P * (y * (y < 0 ? -y : y) - y) + y;
+}
+
+
+// x range: [-PI, PI]
+float fast_cosine(float x) {
+    constexpr float PI = 3.14159265358f;
+    constexpr float B = 4.0f / PI;
+    constexpr float C = -4.0f / (PI * PI);
+    constexpr float P = 0.225f;
+
+    x = (x > 0) ? -x : x;
+    x += PI/2;
+
+    return fast_sine(x);
+}
+
+
 static mp_obj_t user_gradient(size_t n_args, const mp_obj_t *args) {
 
     // Create a 1D gradient.
