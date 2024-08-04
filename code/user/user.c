@@ -67,11 +67,18 @@ static mp_obj_t user_gradient(size_t n_args, const mp_obj_t *args) {
     return MP_OBJ_FROM_PTR(results);
 }
 
+static mp_obj_t user_test(mp_obj_t foo) {
+
+
+}
+
 MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(user_gradient_obj, 1, 4, user_gradient);
+MP_DEFINE_CONST_FUN_OBJ_1(user_test_obj, user_test);
 
 static const mp_rom_map_elem_t ulab_user_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_user) },
     { MP_ROM_QSTR(MP_QSTR_gradient), MP_ROM_PTR(&user_gradient_obj) },
+    { MP_ROM_QSTR(MP_QSTR_test), MP_ROM_PTR(&user_test_obj) },
 };
 
 static MP_DEFINE_CONST_DICT(mp_module_ulab_user_globals, ulab_user_globals_table);
