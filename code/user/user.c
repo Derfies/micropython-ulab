@@ -100,12 +100,17 @@ static mp_obj_t user_test(mp_obj_t foo) {
 
     ndarray_obj_t *results = ndarray_new_dense_ndarray(ndarray->ndim, ndarray->shape, ndarray->dtype);
 
-    mp_int_t val = 0;
-    mp_int_t val_step = 0.1;
-    for(size_t i=0; i < ndarray->len; i++, (val) += (val_step)) {
-        ndarray_set_value(ndarray->dtype, results->array, i, mp_obj_new_float(val));
-    }
+//    mp_int_t val = 0;
+//    mp_int_t val_step = 0.1;
+//    for(size_t i=0; i < ndarray->len; i++, (val) += (val_step)) {
+//        ndarray_set_value(ndarray->dtype, results->array, i, mp_obj_new_float(val));
+//    }
 
+    uint8_t *array = (uint8_t *)ndarray->array;
+    uint8_t *rarray = (uint8_t *)results->array;
+    for(size_t i=0; i < ndarray->len; i++, array++) {
+        *rarray++ = mp_obj_new_float(1.1);
+    }
 
     return MP_OBJ_FROM_PTR(results);
 }
