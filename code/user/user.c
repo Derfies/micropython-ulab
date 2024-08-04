@@ -24,6 +24,8 @@
 
 // x range: [-PI,PI]
 float fast_sine(float x) {
+
+    // TODO: use mp_float_t?
     const float PI = 3.14159265358f;
     const float B = 4.0f / PI;
     const float C = -4.0f / (PI * PI);
@@ -125,11 +127,12 @@ static mp_obj_t user_quake_uvs(mp_obj_t rhs, mp_obj_t lhs) {
 
     ndarray_obj_t *results = ndarray_new_dense_ndarray(ndarray->ndim, ndarray->shape, ndarray->dtype);
 
+    mp_float_t foo = 1.0;
     mp_float_t *array = (mp_float_t *)ndarray->array;
     mp_float_t (*func1)(void *) = ndarray_get_float_function(ndarray->dtype);
     mp_float_t *rarray = (mp_float_t *)results->array;
     for(size_t i=0; i < ndarray->len; i++) {
-        *rarray++ = func1(array);
+        *rarray++ = func1(array) + foo;
         array++;
     }
 
