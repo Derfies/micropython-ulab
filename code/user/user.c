@@ -38,9 +38,6 @@ float fast_sine(float x) {
 // x range: [-PI, PI]
 float fast_cosine(float x) {
     const float PI = 3.14159265358f;
-//    const float B = 4.0f / PI;
-//    const float C = -4.0f / (PI * PI);
-//    const float P = 0.225f;
 
     x = (x > 0) ? -x : x;
     x += PI/2;
@@ -94,7 +91,23 @@ static mp_obj_t user_gradient(size_t n_args, const mp_obj_t *args) {
     return MP_OBJ_FROM_PTR(results);
 }
 
-static mp_obj_t user_test(mp_obj_t arg) {
+static mp_obj_t user_fast_sin(mp_obj_t arg) {
+
+    ndarray_obj_t *ndarray = MP_OBJ_TO_PTR(arg);
+    ndarray_obj_t *results = ndarray_new_dense_ndarray(ndarray->ndim, ndarray->shape, ndarray->dtype);
+
+    mp_float_t *array = (mp_float_t *)ndarray->array;
+    mp_float_t (*func1)(void *) = ndarray_get_float_function(ndarray->dtype);
+    mp_float_t *rarray = (mp_float_t *)results->array;
+    for(size_t i=0; i < ndarray->len; i++) {
+        *rarray++ = fast_sine(func1(array));
+        array++;
+    }
+
+    return MP_OBJ_FROM_PTR(results);
+}
+
+static mp_obj_t user_fast_cos(mp_obj_t arg) {
 
     ndarray_obj_t *ndarray = MP_OBJ_TO_PTR(arg);
     ndarray_obj_t *results = ndarray_new_dense_ndarray(ndarray->ndim, ndarray->shape, ndarray->dtype);
@@ -111,12 +124,13 @@ static mp_obj_t user_test(mp_obj_t arg) {
 }
 
 MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(user_gradient_obj, 1, 4, user_gradient);
-MP_DEFINE_CONST_FUN_OBJ_1(user_test_obj, user_test);
+MP_DEFINE_CONST_FUN_OBJ_1(user_fast_cos_obj, user_fast_cos);
 
 static const mp_rom_map_elem_t ulab_user_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_user) },
     { MP_ROM_QSTR(MP_QSTR_gradient), MP_ROM_PTR(&user_gradient_obj) },
-    { MP_ROM_QSTR(MP_QSTR_test), MP_ROM_PTR(&user_test_obj) },
+    { MP_ROM_QSTR(MP_QSTR_fast_sin), MP_ROM_PTR(&user_fast_sin_obj) },
+    { MP_ROM_QSTR(MP_QSTR_fast_cos), MP_ROM_PTR(&user_fast_cos_obj) },
 };
 
 static MP_DEFINE_CONST_DICT(mp_module_ulab_user_globals, ulab_user_globals_table);
