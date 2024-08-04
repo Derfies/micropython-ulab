@@ -69,7 +69,7 @@ static mp_obj_t user_gradient(size_t n_args, const mp_obj_t *args) {
 
 static mp_obj_t user_test(mp_obj_t foo) {
 
-
+    return mp_obj_new_int(1);
 }
 
 MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(user_gradient_obj, 1, 4, user_gradient);
