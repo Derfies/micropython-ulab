@@ -112,8 +112,8 @@ static mp_obj_t user_test(mp_obj_t foo) {
 //    uint8_t *array = (uint8_t *)ndarray->array;
 //    uint8_t *rarray = (uint8_t *)results->array;
     mp_float_t *rarray = (mp_float_t *)results->array;
-    mp_float_t dot = 1.1;
-    for(size_t i=0; i < ndarray->len; i++, array++) {
+    mp_float_t x = 1.1;
+    for(size_t i=0; i < ndarray->len; i++) {
         *rarray++ = x;
     }
 //    uint8_t *array = (uint8_t *)ndarray->array;
