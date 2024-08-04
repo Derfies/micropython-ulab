@@ -23,12 +23,18 @@
 //|
 
 
+extern const float PI = 3.14159265358f;
+extern float B = 4.0f / PI;
+extern float C = -4.0f / (PI * PI);
+extern float P = 0.225f;
+
+
 // x range: [-PI,PI]
 float fast_sine(float x) {
-    constexpr float PI = 3.14159265358f;
-    constexpr float B = 4.0f / PI;
-    constexpr float C = -4.0f / (PI * PI);
-    constexpr float P = 0.225f;
+//    constexpr float PI = 3.14159265358f;
+//    constexpr float B = 4.0f / PI;
+//    constexpr float C = -4.0f / (PI * PI);
+//    constexpr float P = 0.225f;
 
     float y = B * x + C * x * (x < 0 ? -x : x);
     return P * (y * (y < 0 ? -y : y) - y) + y;
@@ -37,10 +43,10 @@ float fast_sine(float x) {
 
 // x range: [-PI, PI]
 float fast_cosine(float x) {
-    constexpr float PI = 3.14159265358f;
-    constexpr float B = 4.0f / PI;
-    constexpr float C = -4.0f / (PI * PI);
-    constexpr float P = 0.225f;
+//    constexpr float PI = 3.14159265358f;
+//    constexpr float B = 4.0f / PI;
+//    constexpr float C = -4.0f / (PI * PI);
+//    constexpr float P = 0.225f;
 
     x = (x > 0) ? -x : x;
     x += PI/2;
