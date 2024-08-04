@@ -69,12 +69,14 @@ static mp_obj_t user_gradient(size_t n_args, const mp_obj_t *args) {
 
 static mp_obj_t user_test(mp_obj_t foo) {
 
-    ndarray_obj_t *new_ndarray = ndarray_new_dense_ndarray(foo->ndim, foo->shape, foo->dtype);
+    ndarray_obj_t *ndarray = MP_OBJ_TO_PTR(foo);
+
+    ndarray_obj_t *results = ndarray_new_dense_ndarray(ndarray->ndim, ndarray->shape, ndarray->dtype);
 
     mp_int_t val = 0;
     mp_int_t val_step = 0.1;
-    for(size_t i=0; i < foo->len; i++, (val) += (val_step)) {
-        ndarray_set_value(foo->dtype, results->array, i, mp_obj_new_float(val));
+    for(size_t i=0; i < ndarray->len; i++, (val) += (val_step)) {
+        ndarray_set_value(ndarray->dtype, results->array, i, mp_obj_new_float(val));
     }
 
 
