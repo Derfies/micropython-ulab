@@ -111,8 +111,8 @@ static mp_obj_t user_test(mp_obj_t foo) {
 //
 //    uint8_t *array = (uint8_t *)ndarray->array;
 //    uint8_t *rarray = (uint8_t *)results->array;
-    mp_float_t *array1 = (uint8_t *)m1->array;
-    mp_float_t (*func1)(void *) = ndarray_get_float_function(foo->dtype);
+    mp_float_t *array1 = (uint8_t *)ndarray->array;
+    mp_float_t (*func1)(void *) = ndarray_get_float_function(ndarray->dtype);
 
 
     mp_float_t *rarray = (mp_float_t *)results->array;
