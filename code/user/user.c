@@ -109,7 +109,7 @@ static mp_obj_t user_test(mp_obj_t foo) {
     uint8_t *array = (uint8_t *)ndarray->array;
     uint8_t *rarray = (uint8_t *)results->array;
     for(size_t i=0; i < ndarray->len; i++, array++) {
-        *rarray++ = mp_obj_new_float(1.1);
+        *rarray++ = 1.1;
     }
 
     return MP_OBJ_FROM_PTR(results);
