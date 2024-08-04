@@ -124,6 +124,7 @@ static mp_obj_t user_fast_cos(mp_obj_t arg) {
 }
 
 MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(user_gradient_obj, 1, 4, user_gradient);
+MP_DEFINE_CONST_FUN_OBJ_1(user_fast_sin_obj, user_fast_sin);
 MP_DEFINE_CONST_FUN_OBJ_1(user_fast_cos_obj, user_fast_cos);
 
 static const mp_rom_map_elem_t ulab_user_globals_table[] = {
