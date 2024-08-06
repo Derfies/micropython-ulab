@@ -85,7 +85,7 @@ static mp_obj_t user_square(mp_obj_t arg1, mp_obj_t arg2) {
     return MP_OBJ_FROM_PTR(results);
 }
 
-MP_DEFINE_CONST_FUN_OBJ_1(user_square_obj, user_square);
+MP_DEFINE_CONST_FUN_OBJ_2(user_square_obj, user_square);
 
 static const mp_rom_map_elem_t ulab_user_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_user) },
