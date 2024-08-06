@@ -122,39 +122,15 @@ static mp_obj_t user_fast_cos(mp_obj_t arg) {
     return MP_OBJ_FROM_PTR(results);
 }
 
-static mp_obj_t user_quake_uvs(mp_obj_t rhs, mp_obj_t lhs) {
-    ndarray_obj_t *ndarray = ndarray_binary_op(MP_BINARY_OP_MULTIPLY, rhs, lhs);
-
-    ndarray_obj_t *results = ndarray_new_dense_ndarray(ndarray->ndim, ndarray->shape, ndarray->dtype);
-
-    mp_float_t foo = 1.0;
-    mp_float_t *array = (mp_float_t *)ndarray->array;
-    mp_float_t (*func1)(void *) = ndarray_get_float_function(ndarray->dtype);
-    mp_float_t *rarray = (mp_float_t *)results->array;
-    for(size_t i=0; i < ndarray->len; i++) {
-        *rarray++ = func1(array) + foo;
-        array++;
-    }
-
-    return MP_OBJ_FROM_PTR(results);
-//    float scaledTime = iTime * speed;
-//    vec2 scaledCoords = coords * frequency;
-//    float x = sin(scaledTime + scaledCoords.x) * amplitude;
-//    float y = sin(scaledTime + scaledCoords.y) * amplitude;
-//    return coords + vec2(y, x);
-}
-
 MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(user_gradient_obj, 1, 4, user_gradient);
 MP_DEFINE_CONST_FUN_OBJ_1(user_fast_sin_obj, user_fast_sin);
 MP_DEFINE_CONST_FUN_OBJ_1(user_fast_cos_obj, user_fast_cos);
-MP_DEFINE_CONST_FUN_OBJ_2(user_quake_uvs_obj, user_quake_uvs);
 
 static const mp_rom_map_elem_t ulab_user_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_user) },
     { MP_ROM_QSTR(MP_QSTR_gradient), MP_ROM_PTR(&user_gradient_obj) },
     { MP_ROM_QSTR(MP_QSTR_fast_sin), MP_ROM_PTR(&user_fast_sin_obj) },
     { MP_ROM_QSTR(MP_QSTR_fast_cos), MP_ROM_PTR(&user_fast_cos_obj) },
-    { MP_ROM_QSTR(MP_QSTR_quake_uvs), MP_ROM_PTR(&user_quake_uvs_obj) },
 };
 
 static MP_DEFINE_CONST_DICT(mp_module_ulab_user_globals, ulab_user_globals_table);
