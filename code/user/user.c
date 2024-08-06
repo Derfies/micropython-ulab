@@ -22,58 +22,65 @@
 //| """This module should hold arbitrary user-defined functions."""
 //|
 
-static mp_obj_t user_square(mp_obj_t arg) {
+static mp_obj_t user_square(mp_obj_t arg1, mp_obj_t arg2) {
     // the function takes a single dense ndarray, and calculates the
     // element-wise square of its entries
 
     // raise a TypeError exception, if the input is not an ndarray
-    if(!mp_obj_is_type(arg, &ulab_ndarray_type)) {
-        mp_raise_TypeError(MP_ERROR_TEXT("input must be an ndarray"));
-    }
-    ndarray_obj_t *ndarray = MP_OBJ_TO_PTR(arg);
+//    if(!mp_obj_is_type(arg, &ulab_ndarray_type)) {
+//        mp_raise_TypeError(MP_ERROR_TEXT("input must be an ndarray"));
+//    }
+    ndarray_obj_t *ndarray = MP_OBJ_TO_PTR(arg1);
+    mp_obj_array_t *array = MP_OBJ_TO_PTR(arg2);
+
 
     // make sure that the input is a dense array
-    if(!ndarray_is_dense(ndarray)) {
-        mp_raise_TypeError(MP_ERROR_TEXT("input must be a dense ndarray"));
-    }
+//    if(!ndarray_is_dense(ndarray)) {
+//        mp_raise_TypeError(MP_ERROR_TEXT("input must be a dense ndarray"));
+//    }
 
     // if the input is a dense array, create `results` with the same number of
     // dimensions, shape, and dtype
     ndarray_obj_t *results = ndarray_new_dense_ndarray(ndarray->ndim, ndarray->shape, ndarray->dtype);
 
-    // since in a dense array the iteration over the elements is trivial, we
-    // can cast the data arrays ndarray->array and results->array to the actual type
-    if(ndarray->dtype == NDARRAY_UINT8) {
-        uint8_t *array = (uint8_t *)ndarray->array;
-        uint8_t *rarray = (uint8_t *)results->array;
-        for(size_t i=0; i < ndarray->len; i++, array++) {
-            *rarray++ = (*array) * (*array);
-        }
-    } else if(ndarray->dtype == NDARRAY_INT8) {
-        int8_t *array = (int8_t *)ndarray->array;
-        int8_t *rarray = (int8_t *)results->array;
-        for(size_t i=0; i < ndarray->len; i++, array++) {
-            *rarray++ = (*array) * (*array);
-        }
-    } else if(ndarray->dtype == NDARRAY_UINT16) {
-        uint16_t *array = (uint16_t *)ndarray->array;
-        uint16_t *rarray = (uint16_t *)results->array;
-        for(size_t i=0; i < ndarray->len; i++, array++) {
-            *rarray++ = (*array) * (*array);
-        }
-    } else if(ndarray->dtype == NDARRAY_INT16) {
-        int16_t *array = (int16_t *)ndarray->array;
-        int16_t *rarray = (int16_t *)results->array;
-        for(size_t i=0; i < ndarray->len; i++, array++) {
-            *rarray++ = (*array) * (*array);
-        }
-    } else { // if we end up here, the dtype is NDARRAY_FLOAT
-        mp_float_t *array = (mp_float_t *)ndarray->array;
-        mp_float_t *rarray = (mp_float_t *)results->array;
-        for(size_t i=0; i < ndarray->len; i++, array++) {
-            *rarray++ = (*array) * (*array);
-        }
+    // Write values into results array.
+    for(size_t i=0; i < results->len; i++) {
+        ndarray_set_value(NDARRAY_UINT8, results->array, i, mp_binary_get_val_array(array->typecode, array->items, i));
     }
+//
+//    // since in a dense array the iteration over the elements is trivial, we
+//    // can cast the data arrays ndarray->array and results->array to the actual type
+//    if(ndarray->dtype == NDARRAY_UINT8) {
+//        uint8_t *array = (uint8_t *)ndarray->array;
+//        uint8_t *rarray = (uint8_t *)results->array;
+//        for(size_t i=0; i < ndarray->len; i++, array++) {
+//            *rarray++ = (*array) * (*array);
+//        }
+//    } else if(ndarray->dtype == NDARRAY_INT8) {
+//        int8_t *array = (int8_t *)ndarray->array;
+//        int8_t *rarray = (int8_t *)results->array;
+//        for(size_t i=0; i < ndarray->len; i++, array++) {
+//            *rarray++ = (*array) * (*array);
+//        }
+//    } else if(ndarray->dtype == NDARRAY_UINT16) {
+//        uint16_t *array = (uint16_t *)ndarray->array;
+//        uint16_t *rarray = (uint16_t *)results->array;
+//        for(size_t i=0; i < ndarray->len; i++, array++) {
+//            *rarray++ = (*array) * (*array);
+//        }
+//    } else if(ndarray->dtype == NDARRAY_INT16) {
+//        int16_t *array = (int16_t *)ndarray->array;
+//        int16_t *rarray = (int16_t *)results->array;
+//        for(size_t i=0; i < ndarray->len; i++, array++) {
+//            *rarray++ = (*array) * (*array);
+//        }
+//    } else { // if we end up here, the dtype is NDARRAY_FLOAT
+//        mp_float_t *array = (mp_float_t *)ndarray->array;
+//        mp_float_t *rarray = (mp_float_t *)results->array;
+//        for(size_t i=0; i < ndarray->len; i++, array++) {
+//            *rarray++ = (*array) * (*array);
+//        }
+//    }
     // at the end, return a micrppython object
     return MP_OBJ_FROM_PTR(results);
 }
