@@ -29,7 +29,7 @@ static mp_obj_t user_square(mp_obj_t arg1, mp_obj_t arg2) {
 
     mp_int_t val = 13;
     //uint8_t *rarray = (uint8_t *)ndarray->array;
-    for(size_t i=0; i < ndarray->len; i++, array++) {
+    for(size_t i=0; i < ndarray->len; i++) {
         mp_binary_set_val_array('I', array->items, i, mp_obj_new_int(val));
     }
     //mp_obj_new_int(*rarray++)
