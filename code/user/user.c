@@ -21,18 +21,17 @@
 
 //| """This module should hold arbitrary user-defined functions."""
 //|
+static mp_obj_t user_square(size_t n_args, const mp_obj_t *args) {
 
-static mp_obj_t user_square(mp_obj_t arg1, mp_obj_t arg2, mp_obj_t arg3, mp_obj_t arg4) {
-
-    ndarray_obj_t *r = MP_OBJ_TO_PTR(arg1);
-    ndarray_obj_t *g = MP_OBJ_TO_PTR(arg2);
-    ndarray_obj_t *b = MP_OBJ_TO_PTR(arg3);
-    mp_obj_array_t *array = MP_OBJ_TO_PTR(arg4);
+    ndarray_obj_t *r = MP_OBJ_TO_PTR(args[0]);
+    ndarray_obj_t *g = MP_OBJ_TO_PTR(args[1]);
+    ndarray_obj_t *b = MP_OBJ_TO_PTR(args[2]);
+    mp_obj_array_t *array = MP_OBJ_TO_PTR(args[3]);
 
     uint8_t *rarray = (uint8_t *)r->array;
     uint8_t *garray = (uint8_t *)g->array;
     uint8_t *barray = (uint8_t *)b->array;
-    for(size_t i=0; i < ndarray->len; i++, rarray++, garray++, barray++) {
+    for(size_t i=0; i < r->len; i++, rarray++, garray++, barray++) {
         mp_binary_set_val_array('I', array->items, i, mp_obj_new_int((*garray << 16) + (*rarray << 8) + *barray));
     }
 
