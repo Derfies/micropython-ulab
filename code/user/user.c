@@ -122,7 +122,7 @@ static mp_obj_t user_fast_cos(mp_obj_t arg) {
     return MP_OBJ_FROM_PTR(results);
 }
 
-static mp_obj_t neopixel_pio(size_t n_args, const mp_obj_t *args) {
+static mp_obj_t user_neopixel_pio(size_t n_args, const mp_obj_t *args) {
 
     ndarray_obj_t *r = MP_OBJ_TO_PTR(args[0]);
     ndarray_obj_t *g = MP_OBJ_TO_PTR(args[1]);
@@ -141,7 +141,7 @@ static mp_obj_t neopixel_pio(size_t n_args, const mp_obj_t *args) {
 MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(user_gradient_obj, 1, 4, user_gradient);
 MP_DEFINE_CONST_FUN_OBJ_1(user_fast_sin_obj, user_fast_sin);
 MP_DEFINE_CONST_FUN_OBJ_1(user_fast_cos_obj, user_fast_cos);
-MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(neopixel_pio_obj, 4, 4, neopixel_pio);
+MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(user_neopixel_pio_obj, 4, 4, user_neopixel_pio);
 
 static const mp_rom_map_elem_t ulab_user_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_user) },
