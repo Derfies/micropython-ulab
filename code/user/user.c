@@ -27,48 +27,23 @@ static mp_obj_t user_square(mp_obj_t arg1, mp_obj_t arg2) {
     ndarray_obj_t *ndarray = MP_OBJ_TO_PTR(arg1);
     mp_obj_array_t *array = MP_OBJ_TO_PTR(arg2);
 
-    //mp_int_t (*func1)(void *) = ndarray_get_float_function(ndarray->dtype);
-
     mp_int_t val = 13;
-
-    for(size_t i=0; i < ndarray->len; i++) {
-        mp_binary_set_val_array('I', array->items, i++, mp_obj_new_int(val));
+    uint8_t *rarray = (uint8_t *)ndarray->array;
+    for(size_t i=0; i < ndarray->len; i++, , array++) {
+        mp_binary_set_val_array('I', array->items, i++, mp_obj_new_int(*array));
     }
-//
-//
-//
-//    ndarray_obj_t *ndarray = MP_OBJ_TO_PTR(arg1);
-//    mp_obj_array_t *array = MP_OBJ_TO_PTR(arg2);
-//
-//    // if the input is a dense array, create `results` with the same number of
-//    // dimensions, shape, and dtype
-//    ndarray_obj_t *results = ndarray_new_dense_ndarray(ndarray->ndim, ndarray->shape, ndarray->dtype);
-//
-//    for(size_t i=0; i < results->len; i++) {
-//        uint8_t adv_item_len  = ((uint8_t * )data->items)[byte_index];
-//    }
 
 //
+//     "        uint8_t *array = (uint8_t *)ndarray->array;\n",
+//        "        uint8_t *rarray = (uint8_t *)results->array;\n",
+//        "        for(size_t i=0; i < ndarray->len; i++, array++) {\n",
+//        "            *rarray++ = (*array) * (*array);\n",
+//        "        }\n",
 //
-//
-//     // TODO: check if self->data is set
-//    mp_obj_array_t * data = MP_OBJ_TO_PTR(self->data);
-//
-//    uint16_t byte_index = 0;
-//
-//    while (byte_index < data->len) {
-//        mp_obj_tuple_t *t = MP_OBJ_TO_PTR(mp_obj_new_tuple(3, NULL));
-//
-//        uint8_t adv_item_len  = ((uint8_t * )data->items)[byte_index];
-//
-//
-////    // Write values into results array.
-////    for(size_t i=0; i < results->len; i++) {
-////        //ndarray_set_value(NDARRAY_UINT8, results->array, i, mp_binary_get_val_array(array->typecode, array->items, i));
-////    }
 
-    // at the end, return a micrppython object
-    //return MP_OBJ_FROM_PTR(results);
+
+
+
     return mp_const_none;
 }
 
