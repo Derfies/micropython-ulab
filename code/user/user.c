@@ -27,11 +27,12 @@ static mp_obj_t user_square(mp_obj_t arg1, mp_obj_t arg2) {
     ndarray_obj_t *ndarray = MP_OBJ_TO_PTR(arg1);
     mp_obj_array_t *array = MP_OBJ_TO_PTR(arg2);
 
-    //mp_int_t val = 13;
+    mp_int_t val = 13;
     uint8_t *rarray = (uint8_t *)ndarray->array;
     for(size_t i=0; i < ndarray->len; i++, array++) {
-        mp_binary_set_val_array('I', array->items, i, mp_obj_new_int(*rarray));
+        mp_binary_set_val_array('I', array->items, i, mp_obj_new_int(val));
     }
+    //mp_obj_new_int(*rarray++)
 
 //
 //     "        uint8_t *array = (uint8_t *)ndarray->array;\n",
