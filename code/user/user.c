@@ -22,33 +22,24 @@
 //| """This module should hold arbitrary user-defined functions."""
 //|
 
-static mp_obj_t user_square(mp_obj_t arg1, mp_obj_t arg2) {
+static mp_obj_t user_square(mp_obj_t arg1, mp_obj_t arg2, mp_obj_t arg3, mp_obj_t arg4) {
 
-    ndarray_obj_t *ndarray = MP_OBJ_TO_PTR(arg1);
-    mp_obj_array_t *array = MP_OBJ_TO_PTR(arg2);
+    ndarray_obj_t *r = MP_OBJ_TO_PTR(arg1);
+    ndarray_obj_t *g = MP_OBJ_TO_PTR(arg2);
+    ndarray_obj_t *b = MP_OBJ_TO_PTR(arg3);
+    mp_obj_array_t *array = MP_OBJ_TO_PTR(arg4);
 
-    //mp_int_t val = 13;
-    uint8_t *rarray = (uint8_t *)ndarray->array;
-    for(size_t i=0; i < ndarray->len; i++, rarray++) {
-        mp_binary_set_val_array('I', array->items, i, mp_obj_new_int(*rarray << 16));
+    uint8_t *rarray = (uint8_t *)r->array;
+    uint8_t *garray = (uint8_t *)g->array;
+    uint8_t *barray = (uint8_t *)b->array;
+    for(size_t i=0; i < ndarray->len; i++, rarray++, garray++, barray++) {
+        mp_binary_set_val_array('I', array->items, i, mp_obj_new_int((*garray << 16) + (*rarray << 8) + *barray));
     }
-    //mp_obj_new_int(*rarray++)
-
-//
-//     "        uint8_t *array = (uint8_t *)ndarray->array;\n",
-//        "        uint8_t *rarray = (uint8_t *)results->array;\n",
-//        "        for(size_t i=0; i < ndarray->len; i++, array++) {\n",
-//        "            *rarray++ = (*array) * (*array);\n",
-//        "        }\n",
-//
-
-
-
 
     return mp_const_none;
 }
 
-MP_DEFINE_CONST_FUN_OBJ_2(user_square_obj, user_square);
+MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(user_square_obj, 4, 4, user_square);
 
 static const mp_rom_map_elem_t ulab_user_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_user) },
