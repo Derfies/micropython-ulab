@@ -148,6 +148,7 @@ static const mp_rom_map_elem_t ulab_user_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR_gradient), MP_ROM_PTR(&user_gradient_obj) },
     { MP_ROM_QSTR(MP_QSTR_fast_sin), MP_ROM_PTR(&user_fast_sin_obj) },
     { MP_ROM_QSTR(MP_QSTR_fast_cos), MP_ROM_PTR(&user_fast_cos_obj) },
+    { MP_ROM_QSTR(MP_QSTR_neopixel_pio), MP_ROM_PTR(&user_neopixel_pio_obj) },
 };
 
 static MP_DEFINE_CONST_DICT(mp_module_ulab_user_globals, ulab_user_globals_table);
