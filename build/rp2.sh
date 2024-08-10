@@ -13,6 +13,7 @@ fi
 if [ ! -d $MPY_DIR ]; then
     printf "Cloning MicroPython\n"
     git clone https://github.com/micropython/micropython.git micropython
+    git checkout tags/v1.21.0
 fi
 
 cd $MPY_DIR

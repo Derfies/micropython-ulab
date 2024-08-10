@@ -22,67 +22,133 @@
 //| """This module should hold arbitrary user-defined functions."""
 //|
 
-static mp_obj_t user_square(mp_obj_t arg) {
-    // the function takes a single dense ndarray, and calculates the
-    // element-wise square of its entries
+// x range: [-PI,PI]
+float fast_sine(float x) {
 
-    // raise a TypeError exception, if the input is not an ndarray
-    if(!mp_obj_is_type(arg, &ulab_ndarray_type)) {
-        mp_raise_TypeError(MP_ERROR_TEXT("input must be an ndarray"));
+    // TODO: use mp_float_t?
+    const float PI = 3.14159265358f;
+    const float B = 4.0f / PI;
+    const float C = -4.0f / (PI * PI);
+    const float P = 0.225f;
+
+    float y = B * x + C * x * (x < 0 ? -x : x);
+    return P * (y * (y < 0 ? -y : y) - y) + y;
+}
+
+// x range: [-PI, PI]
+float fast_cosine(float x) {
+    const float PI = 3.14159265358f;
+
+    x = (x > 0) ? -x : x;
+    x += PI/2;
+
+    return fast_sine(x);
+}
+
+static mp_obj_t user_gradient(size_t n_args, const mp_obj_t *args) {
+
+    // Create a 1D gradient.
+    // Resulting array should be of shape (3, 256)
+    // This is because we want to be able to perform np.take on the result, and
+    // there needs to be 256 values to do the lookup.
+    // Resulting array will be of type int.
+    // Some cumulative float error happening here since we calculate step as a
+    // float but cast to int every time.
+
+    // TODO: Off by 1 error - 255 element isn't being filled.
+    ndarray_obj_t *results = ndarray_new_linear_array(256, NDARRAY_UINT8);
+
+    mp_int_t pos = 0;
+    mp_int_t val = 0;
+
+    for(size_t a=0; a < n_args; a++) {
+
+        // Ensure the arg is a tuple.
+        if(!mp_obj_is_type(args[a], &mp_type_tuple)) {
+            mp_raise_TypeError(MP_ERROR_TEXT("Stop must be of type tuple"));
+        }
+
+        // Ensure the tuple is of size 2.
+        mp_obj_tuple_t *stop = MP_OBJ_TO_PTR(args[a]);
+        if(stop->len != 2) {
+            mp_raise_TypeError(MP_ERROR_TEXT("Stop must be of length 2"));
+        }
+
+        mp_int_t next_pos = mp_obj_get_int(stop->items[0]);
+        mp_int_t next_val = mp_obj_get_int(stop->items[1]);
+        mp_int_t val_step = (next_val - val) / (next_pos - pos);
+
+        // Write values into results array.
+        for(size_t i=pos; i < next_pos; i++, (val) += (val_step)) {
+            ndarray_set_value(NDARRAY_UINT8, results->array, i, mp_obj_new_int(val));
+        }
+
+        pos = next_pos;
+        val = next_val;
     }
-    ndarray_obj_t *ndarray = MP_OBJ_TO_PTR(arg);
 
-    // make sure that the input is a dense array
-    if(!ndarray_is_dense(ndarray)) {
-        mp_raise_TypeError(MP_ERROR_TEXT("input must be a dense ndarray"));
-    }
-
-    // if the input is a dense array, create `results` with the same number of
-    // dimensions, shape, and dtype
-    ndarray_obj_t *results = ndarray_new_dense_ndarray(ndarray->ndim, ndarray->shape, ndarray->dtype);
-
-    // since in a dense array the iteration over the elements is trivial, we
-    // can cast the data arrays ndarray->array and results->array to the actual type
-    if(ndarray->dtype == NDARRAY_UINT8) {
-        uint8_t *array = (uint8_t *)ndarray->array;
-        uint8_t *rarray = (uint8_t *)results->array;
-        for(size_t i=0; i < ndarray->len; i++, array++) {
-            *rarray++ = (*array) * (*array);
-        }
-    } else if(ndarray->dtype == NDARRAY_INT8) {
-        int8_t *array = (int8_t *)ndarray->array;
-        int8_t *rarray = (int8_t *)results->array;
-        for(size_t i=0; i < ndarray->len; i++, array++) {
-            *rarray++ = (*array) * (*array);
-        }
-    } else if(ndarray->dtype == NDARRAY_UINT16) {
-        uint16_t *array = (uint16_t *)ndarray->array;
-        uint16_t *rarray = (uint16_t *)results->array;
-        for(size_t i=0; i < ndarray->len; i++, array++) {
-            *rarray++ = (*array) * (*array);
-        }
-    } else if(ndarray->dtype == NDARRAY_INT16) {
-        int16_t *array = (int16_t *)ndarray->array;
-        int16_t *rarray = (int16_t *)results->array;
-        for(size_t i=0; i < ndarray->len; i++, array++) {
-            *rarray++ = (*array) * (*array);
-        }
-    } else { // if we end up here, the dtype is NDARRAY_FLOAT
-        mp_float_t *array = (mp_float_t *)ndarray->array;
-        mp_float_t *rarray = (mp_float_t *)results->array;
-        for(size_t i=0; i < ndarray->len; i++, array++) {
-            *rarray++ = (*array) * (*array);
-        }
-    }
-    // at the end, return a micrppython object
     return MP_OBJ_FROM_PTR(results);
 }
 
-MP_DEFINE_CONST_FUN_OBJ_1(user_square_obj, user_square);
+static mp_obj_t user_fast_sin(mp_obj_t arg) {
+
+    ndarray_obj_t *ndarray = MP_OBJ_TO_PTR(arg);
+    ndarray_obj_t *results = ndarray_new_dense_ndarray(ndarray->ndim, ndarray->shape, ndarray->dtype);
+
+    mp_float_t *array = (mp_float_t *)ndarray->array;
+    mp_float_t (*func1)(void *) = ndarray_get_float_function(ndarray->dtype);
+    mp_float_t *rarray = (mp_float_t *)results->array;
+    for(size_t i=0; i < ndarray->len; i++) {
+        *rarray++ = fast_sine(func1(array));
+        array++;
+    }
+
+    return MP_OBJ_FROM_PTR(results);
+}
+
+static mp_obj_t user_fast_cos(mp_obj_t arg) {
+
+    ndarray_obj_t *ndarray = MP_OBJ_TO_PTR(arg);
+    ndarray_obj_t *results = ndarray_new_dense_ndarray(ndarray->ndim, ndarray->shape, ndarray->dtype);
+
+    mp_float_t *array = (mp_float_t *)ndarray->array;
+    mp_float_t (*func1)(void *) = ndarray_get_float_function(ndarray->dtype);
+    mp_float_t *rarray = (mp_float_t *)results->array;
+    for(size_t i=0; i < ndarray->len; i++) {
+        *rarray++ = fast_cosine(func1(array));
+        array++;
+    }
+
+    return MP_OBJ_FROM_PTR(results);
+}
+
+static mp_obj_t user_neopixel_pio(size_t n_args, const mp_obj_t *args) {
+
+    ndarray_obj_t *r = MP_OBJ_TO_PTR(args[0]);
+    ndarray_obj_t *g = MP_OBJ_TO_PTR(args[1]);
+    ndarray_obj_t *b = MP_OBJ_TO_PTR(args[2]);
+    mp_obj_array_t *array = MP_OBJ_TO_PTR(args[3]);
+
+    uint8_t *rarray = (uint8_t *)r->array;
+    uint8_t *garray = (uint8_t *)g->array;
+    uint8_t *barray = (uint8_t *)b->array;
+    for(size_t i=0; i < r->len; i++, rarray++, garray++, barray++) {
+        mp_binary_set_val_array('I', array->items, i, mp_obj_new_int((*garray << 16) + (*rarray << 8) + *barray));
+    }
+    return mp_const_none;
+}
+
+MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(user_gradient_obj, 1, 4, user_gradient);
+MP_DEFINE_CONST_FUN_OBJ_1(user_fast_sin_obj, user_fast_sin);
+MP_DEFINE_CONST_FUN_OBJ_1(user_fast_cos_obj, user_fast_cos);
+MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(user_neopixel_pio_obj, 4, 4, user_neopixel_pio);
 
 static const mp_rom_map_elem_t ulab_user_globals_table[] = {
-    { MP_OBJ_NEW_QSTR(MP_QSTR___name__), MP_OBJ_NEW_QSTR(MP_QSTR_user) },
-    { MP_OBJ_NEW_QSTR(MP_QSTR_square), (mp_obj_t)&user_square_obj },
+    { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_user) },
+    { MP_ROM_QSTR(MP_QSTR_gradient), MP_ROM_PTR(&user_gradient_obj) },
+    { MP_ROM_QSTR(MP_QSTR_fast_sin), MP_ROM_PTR(&user_fast_sin_obj) },
+    { MP_ROM_QSTR(MP_QSTR_fast_cos), MP_ROM_PTR(&user_fast_cos_obj) },
+    { MP_ROM_QSTR(MP_QSTR_neopixel_pio), MP_ROM_PTR(&user_neopixel_pio_obj) },
 };
 
 static MP_DEFINE_CONST_DICT(mp_module_ulab_user_globals, ulab_user_globals_table);
