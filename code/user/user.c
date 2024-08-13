@@ -138,7 +138,7 @@ static mp_obj_t user_neopixel_pio(size_t n_args, const mp_obj_t *args) {
     return mp_const_none;
 }
 
-MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(user_gradient_obj, 1, 4, user_gradient);
+MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(user_gradient_obj, 1, 7, user_gradient);
 MP_DEFINE_CONST_FUN_OBJ_1(user_fast_sin_obj, user_fast_sin);
 MP_DEFINE_CONST_FUN_OBJ_1(user_fast_cos_obj, user_fast_cos);
 MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(user_neopixel_pio_obj, 4, 4, user_neopixel_pio);
